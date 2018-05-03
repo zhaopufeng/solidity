@@ -109,6 +109,7 @@ private:
 	virtual bool visit(VariableDeclarationStatement const& _variableDeclarationStatement) override;
 	virtual bool visit(ExpressionStatement const& _expressionStatement) override;
 	virtual bool visit(PlaceholderStatement const&) override;
+	virtual void endVisit(Block const& _block) override;
 
 	/// Repeatedly visits all function which are referenced but which are not compiled yet.
 	void appendMissingFunctions();
@@ -123,6 +124,33 @@ private:
 	/// @returns the runtime assembly for clone contracts.
 	eth::AssemblyPointer cloneRuntime() const;
 
+	/// Adds a new scoped variable.
+	void addScopedVariable(VariableDeclaration const& _decl);
+
+	/// Frees the variables of a certain scope (to be used when leaving).
+	void popBlockScopedVariables(ASTNode const* _node);
+
+	/// Calculates the amount of stack slots allocated for
+	/// local variables inside the latest loop.
+	unsigned stackSizeOfCurrentLoopVariables();
+
+	/// Calculates the amount of stack slots allocated for
+	/// local variables currently allocated.
+	unsigned stackSizeOfCurrentLocalVariables();
+
+	/// Pops _amount slots from the stack and jumps to _jumpTo.
+	/// Also readjusts the stack offset to the original value.
+	void popAndJump(unsigned _amount, eth::AssemblyItem const& _jumpTo);
+
+	/// Called when a break or continue is visited.
+	/// Counts how many stack slots should be freed and
+	/// points to a new tag accordingly.
+	bool visitBreakContinue(Statement const* _statement);
+
+	/// Removes a loop level from the structures that keep
+	/// track of scoped variables.
+	void endVisitLoop(BreakableStatement const* _loop);
+
 	bool const m_optimise;
 	/// Pointer to the runtime compiler in case this is a creation compiler.
 	ContractCompiler* m_runtimeCompiler = nullptr;
@@ -133,9 +161,17 @@ private:
 	std::vector<eth::AssemblyItem> m_returnTags;
 	unsigned m_modifierDepth = 0;
 	FunctionDefinition const* m_currentFunction = nullptr;
-	unsigned m_stackCleanupForReturn = 0; ///< this number of stack elements need to be removed before jump to m_returnTag
+
 	// arguments for base constructors, filled in derived-to-base order
 	std::map<FunctionDefinition const*, ASTNode const*> const* m_baseArguments;
+
+	/// Stores the variables that were declared inside a specific scope, for each modifier depth.
+	std::map<unsigned, std::map<ASTNode const*, std::vector<VariableDeclaration const*>>> m_scopedVariables;
+	/// Stores the variables that were declared inside a specific loop,
+	/// regardless their precise scope, for each modifier depth.
+	std::map<unsigned, std::map<ASTNode const*, std::set<VariableDeclaration const*>>> m_loopScopedVariables;
+	/// Keeps track of loops.
+	std::vector<BreakableStatement const*> m_loops;
 };
 
 }

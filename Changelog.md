@@ -38,6 +38,7 @@ Language Features:
 
 Compiler Features:
  * Type Checker: Show named argument in case of error.
+ * Code Generator: Allocate and free local variables according to their scope.
 
 Bugfixes:
  * Tests: Fix chain parameters to make ipc tests work with newer versions of cpp-ethereum.
