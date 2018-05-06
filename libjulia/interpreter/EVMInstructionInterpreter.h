@@ -74,6 +74,8 @@ private:
 	bool logMemory(bool _write, u256 const& _offset, u256 const& _size = 32, bytes const& _data = {});
 
 	void logTrace(solidity::Instruction _instruction, std::vector<u256> const& _arguments = {}, bytes const& _data = {});
+	/// Appends a log to the trace representing an instruction or similar operation by string,
+	/// with arguments and auxiliary data (if nonempty).
 	void logTrace(std::string const& _pseudoInstruction, std::vector<u256> const& _arguments = {}, bytes const& _data = {});
 
 	InterpreterState& m_state;

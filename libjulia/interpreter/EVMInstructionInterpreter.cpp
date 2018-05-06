@@ -133,7 +133,7 @@ u256 EVMInstructionInterpreter::eval(
 	case Instruction::AND:
 		return arg[0] & arg[1];
 	case Instruction::OR:
-		return arg[0] & arg[1];
+		return arg[0] | arg[1];
 	case Instruction::XOR:
 		return arg[0] ^ arg[1];
 	case Instruction::BYTE:
@@ -144,7 +144,6 @@ u256 EVMInstructionInterpreter::eval(
 		return arg[0] > 255 ? 0 : (arg[1] >> unsigned(arg[0]));
 	case Instruction::SAR:
 	{
-
 		static u256 const hibit = u256(1) << 255;
 		if (arg[0] >= 256)
 			return arg[1] & hibit ? u256(-1) : 0;
@@ -180,8 +179,8 @@ u256 EVMInstructionInterpreter::eval(
 	{
 		if (!logMemoryRead(arg[0], arg[1]))
 			return u256("0x1234cafe1234cafe1234cafe") + arg[0];
-		uint64_t offset = (uint64_t)arg[0];
-		uint64_t size = (uint64_t)arg[1];
+		uint64_t offset = uint64_t(arg[0] & uint64_t(-1));
+		uint64_t size = uint64_t(arg[1] & uint64_t(-1));
 		return u256(keccak256(bytesConstRef(m_state.memory.data() + offset, size)));
 	}
 	case Instruction::ADDRESS:

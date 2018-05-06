@@ -79,6 +79,7 @@ void Interpreter::operator()(Switch const& _switch)
 {
 	solAssert(_switch.expression, "");
 	u256 val = evaluate(*_switch.expression);
+	solAssert(!_switch.cases.empty(), "");
 	for (auto const& c: _switch.cases)
 		// Default case has to be last.
 		if (!c.value || evaluate(*c.value) == val)
@@ -184,15 +185,15 @@ void ExpressionEvaluator::operator()(FunctionCall const& _funCall)
 
 	FunctionDefinition const& fun = *m_functions.at(_funCall.functionName.name);
 	solAssert(m_values.size() == fun.parameters.size(), "");
-	map<string, u256> arguments;
+	map<string, u256> variables;
 	for (size_t i = 0; i < fun.parameters.size(); ++i)
-		arguments[fun.parameters.at(i).name] = m_values.at(i);
+		variables[fun.parameters.at(i).name] = m_values.at(i);
 	for (size_t i = 0; i < fun.returnVariables.size(); ++i)
-		arguments[fun.returnVariables.at(i).name] = 0;
+		variables[fun.returnVariables.at(i).name] = 0;
 
 	// TODO function name lookup could be a little more efficient,
 	// we have to copy the list here.
-	Interpreter interpreter(m_state, arguments, m_functions);
+	Interpreter interpreter(m_state, variables, m_functions);
 	interpreter(fun.body);
 
 	m_values.clear();
@@ -215,6 +216,7 @@ void ExpressionEvaluator::setValue(u256 _value)
 void ExpressionEvaluator::evaluateArgs(vector<Expression> const& _expr)
 {
 	vector<u256> values;
+	/// Function arguments are evaluated in reverse.
 	for (auto const& expr: _expr | boost::adaptors::reversed)
 	{
 		visit(expr);
