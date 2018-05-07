@@ -458,7 +458,7 @@ string IntegerType::richIdentifier() const
 		return "t_" + string(isSigned() ? "" : "u") + "int" + std::to_string(numBits());
 }
 
-bool IntegerType::isImplicitlyConvertibleTo(Type const& _convertTo) const
+BoolResult IntegerType::isImplicitlyConvertibleTo(Type const& _convertTo) const
 {
 	if (_convertTo.category() == category())
 	{
@@ -551,7 +551,7 @@ bigint IntegerType::maxValue() const
 		return (bigint(1) << m_bits) - 1;
 }
 
-TypePointer IntegerType::binaryOperatorResult(Token::Value _operator, TypePointer const& _other) const
+TypeResult IntegerType::binaryOperatorResult(Token::Value _operator, TypePointer const& _other) const
 {
 	if (
 		_other->category() != Category::RationalNumber &&
@@ -624,7 +624,7 @@ string FixedPointType::richIdentifier() const
 	return "t_" + string(isSigned() ? "" : "u") + "fixed" + std::to_string(m_totalBits) + "x" + std::to_string(m_fractionalDigits);
 }
 
-bool FixedPointType::isImplicitlyConvertibleTo(Type const& _convertTo) const
+BoolResult FixedPointType::isImplicitlyConvertibleTo(Type const& _convertTo) const
 {
 	if (_convertTo.category() == category())
 	{
@@ -692,7 +692,7 @@ bigint FixedPointType::minIntegerValue() const
 		return bigint(0);
 }
 
-TypePointer FixedPointType::binaryOperatorResult(Token::Value _operator, TypePointer const& _other) const
+TypeResult FixedPointType::binaryOperatorResult(Token::Value _operator, TypePointer const& _other) const
 {
 	auto commonType = Type::commonType(shared_from_this(), _other);
 
@@ -854,7 +854,7 @@ tuple<bool, rational> RationalNumberType::isValidLiteral(Literal const& _literal
 	return make_tuple(true, value);
 }
 
-bool RationalNumberType::isImplicitlyConvertibleTo(Type const& _convertTo) const
+BoolResult RationalNumberType::isImplicitlyConvertibleTo(Type const& _convertTo) const
 {
 	if (_convertTo.category() == Category::Integer)
 	{
@@ -928,7 +928,7 @@ TypePointer RationalNumberType::unaryOperatorResult(Token::Value _operator) cons
 	return make_shared<RationalNumberType>(value);
 }
 
-TypePointer RationalNumberType::binaryOperatorResult(Token::Value _operator, TypePointer const& _other) const
+TypeResult RationalNumberType::binaryOperatorResult(Token::Value _operator, TypePointer const& _other) const
 {
 	if (_other->category() == Category::Integer || _other->category() == Category::FixedPoint)
 	{
@@ -1110,7 +1110,7 @@ TypePointer RationalNumberType::binaryOperatorResult(Token::Value _operator, Typ
 		if (value.numerator() != 0 && max(mostSignificantBit(abs(value.numerator())), mostSignificantBit(abs(value.denominator()))) > 4096)
 			return TypePointer();
 
-		return make_shared<RationalNumberType>(value);
+		return TypeResult(make_shared<RationalNumberType>(value));
 	}
 }
 
@@ -1242,7 +1242,7 @@ StringLiteralType::StringLiteralType(Literal const& _literal):
 {
 }
 
-bool StringLiteralType::isImplicitlyConvertibleTo(Type const& _convertTo) const
+BoolResult StringLiteralType::isImplicitlyConvertibleTo(Type const& _convertTo) const
 {
 	if (auto fixedBytes = dynamic_cast<FixedBytesType const*>(&_convertTo))
 		return size_t(fixedBytes->numBytes()) >= m_value.size();
@@ -1297,7 +1297,7 @@ FixedBytesType::FixedBytesType(unsigned _bytes): m_bytes(_bytes)
 	);
 }
 
-bool FixedBytesType::isImplicitlyConvertibleTo(Type const& _convertTo) const
+BoolResult FixedBytesType::isImplicitlyConvertibleTo(Type const& _convertTo) const
 {
 	if (_convertTo.category() != category())
 		return false;
@@ -1323,7 +1323,7 @@ TypePointer FixedBytesType::unaryOperatorResult(Token::Value _operator) const
 	return TypePointer();
 }
 
-TypePointer FixedBytesType::binaryOperatorResult(Token::Value _operator, TypePointer const& _other) const
+TypeResult FixedBytesType::binaryOperatorResult(Token::Value _operator, TypePointer const& _other) const
 {
 	if (Token::isShiftOp(_operator))
 	{
@@ -1339,7 +1339,7 @@ TypePointer FixedBytesType::binaryOperatorResult(Token::Value _operator, TypePoi
 
 	// FixedBytes can be compared and have bitwise operators applied to them
 	if (Token::isCompareOp(_operator) || Token::isBitOp(_operator))
-		return commonType;
+		return TypeResult(commonType);
 
 	return TypePointer();
 }
@@ -1380,7 +1380,7 @@ TypePointer BoolType::unaryOperatorResult(Token::Value _operator) const
 	return (_operator == Token::Not) ? shared_from_this() : TypePointer();
 }
 
-TypePointer BoolType::binaryOperatorResult(Token::Value _operator, TypePointer const& _other) const
+TypeResult BoolType::binaryOperatorResult(Token::Value _operator, TypePointer const& _other) const
 {
 	if (category() != _other->category())
 		return TypePointer();
@@ -1390,7 +1390,7 @@ TypePointer BoolType::binaryOperatorResult(Token::Value _operator, TypePointer c
 		return TypePointer();
 }
 
-bool ContractType::isImplicitlyConvertibleTo(Type const& _convertTo) const
+BoolResult ContractType::isImplicitlyConvertibleTo(Type const& _convertTo) const
 {
 	if (*this == _convertTo)
 		return true;
@@ -1497,7 +1497,7 @@ string ReferenceType::identifierLocationSuffix() const
 	return id;
 }
 
-bool ArrayType::isImplicitlyConvertibleTo(const Type& _convertTo) const
+BoolResult ArrayType::isImplicitlyConvertibleTo(const Type& _convertTo) const
 {
 	if (_convertTo.category() != category())
 		return false;
@@ -1932,7 +1932,7 @@ vector<tuple<VariableDeclaration const*, u256, unsigned>> ContractType::stateVar
 	return variablesAndOffsets;
 }
 
-bool StructType::isImplicitlyConvertibleTo(const Type& _convertTo) const
+BoolResult StructType::isImplicitlyConvertibleTo(const Type& _convertTo) const
 {
 	if (_convertTo.category() != category())
 		return false;
@@ -2225,7 +2225,7 @@ unsigned EnumType::memberValue(ASTString const& _member) const
 	solAssert(false, "Requested unknown enum value " + _member);
 }
 
-bool TupleType::isImplicitlyConvertibleTo(Type const& _other) const
+BoolResult TupleType::isImplicitlyConvertibleTo(Type const& _other) const
 {
 	if (auto tupleType = dynamic_cast<TupleType const*>(&_other))
 	{
@@ -2608,7 +2608,7 @@ TypePointer FunctionType::unaryOperatorResult(Token::Value _operator) const
 	return TypePointer();
 }
 
-TypePointer FunctionType::binaryOperatorResult(Token::Value _operator, TypePointer const& _other) const
+TypeResult FunctionType::binaryOperatorResult(Token::Value _operator, TypePointer const& _other) const
 {
 	if (_other->category() != category() || !(_operator == Token::Equal || _operator == Token::NotEqual))
 		return TypePointer();
