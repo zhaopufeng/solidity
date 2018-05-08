@@ -69,7 +69,7 @@ contract MajorityOracle is Oracle {
     /// @return Is outcome set?
     function isOutcomeSet()
         public
-        constant
+        view
         returns (bool)
     {
         (bool outcomeSet, ) = getStatusAndOutcome();
@@ -80,7 +80,7 @@ contract MajorityOracle is Oracle {
     /// @return Outcome
     function getOutcome()
         public
-        constant
+        view
         returns (int)
     {
         (, int winningOutcome) = getStatusAndOutcome();
