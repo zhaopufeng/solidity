@@ -252,7 +252,7 @@ BOOST_AUTO_TEST_CASE(function_type)
 	CompilerStack c;
 	c.addSource("a",
 		"contract C { function f(function() external payable returns (uint) x) "
-		"returns (function() external constant returns (uint)) {} }"
+		"returns (function() external view returns (uint)) {} }"
 	);
 	c.setEVMVersion(dev::test::Options::get().evmVersion());
 	c.parseAndAnalyze();
@@ -266,7 +266,7 @@ BOOST_AUTO_TEST_CASE(function_type)
 	BOOST_CHECK_EQUAL(argument["attributes"]["name"], "x");
 	BOOST_CHECK_EQUAL(argument["attributes"]["type"], "function () payable external returns (uint256)");
 	Json::Value funType = argument["children"][0];
-	BOOST_CHECK_EQUAL(funType["attributes"]["constant"], false);
+	BOOST_CHECK_EQUAL(funType["attributes"]["stateMutability"], "payable");
 	BOOST_CHECK_EQUAL(funType["attributes"]["payable"], true);
 	BOOST_CHECK_EQUAL(funType["attributes"]["visibility"], "external");
 	Json::Value retval = fun["children"][1]["children"][0];
@@ -274,7 +274,7 @@ BOOST_AUTO_TEST_CASE(function_type)
 	BOOST_CHECK_EQUAL(retval["attributes"]["name"], "");
 	BOOST_CHECK_EQUAL(retval["attributes"]["type"], "function () view external returns (uint256)");
 	funType = retval["children"][0];
-	BOOST_CHECK_EQUAL(funType["attributes"]["constant"], true);
+	BOOST_CHECK_EQUAL(funType["attributes"]["stateMutability"], "view");
 	BOOST_CHECK_EQUAL(funType["attributes"]["payable"], false);
 	BOOST_CHECK_EQUAL(funType["attributes"]["visibility"], "external");
 }
