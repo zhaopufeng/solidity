@@ -47,7 +47,19 @@ if ! type wget &>/dev/null; then
     apt-get -y install wget
 fi
 
-apt-get -y install libz3-dev
+
+DIR=$(mktemp -d)
+(
+  cd "$DIR"
+  git clone https://github.com/Z3Prover/z3.git
+  cd z3
+  python scripts/mk_make.py
+  cd build
+  make
+  sudo make install
+)
+rm -rf "$DIR"
+
 
 WORKSPACE=/root/project
 
