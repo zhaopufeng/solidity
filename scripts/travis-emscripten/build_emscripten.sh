@@ -34,6 +34,7 @@
 
 set -ev
 
+
 if ! type git &>/dev/null; then
     # We need git for extracting the commit hash
     apt-get update
@@ -45,6 +46,8 @@ if ! type wget &>/dev/null; then
     apt-get update
     apt-get -y install wget
 fi
+
+apt-get -y install libz3-dev
 
 WORKSPACE=/root/project
 
