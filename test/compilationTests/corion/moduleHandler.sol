@@ -332,7 +332,7 @@ contract moduleHandler is multiOwner, announcementTypes {
         require( _success && _found );
         return (true, token(modules[_id].addr).isICO());
     }
-    function getCurrentSchellingRoundID() public view returns (bool success, uint256 round) {
+    function getCurrentSchellingRoundID() public returns (bool success, uint256 round) {
         /*
             Query of number of the actual Schelling round.
             

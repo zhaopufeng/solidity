@@ -168,7 +168,7 @@ contract provider is module, safeMath, announcementTypes {
             value           = clients[addr].supply[schellingRound];
         }
     }
-    function rightForInterest(uint256 value, bool priv) internal returns (bool) {
+    function rightForInterest(uint256 value, bool priv) internal view returns (bool) {
         /*
             the share from the token emission.
             In case is a private provider it has to be checked if it has enough connected capital to be able to accept share from the token emission.
@@ -345,7 +345,7 @@ contract provider is module, safeMath, announcementTypes {
         getInterest     = rightForInterest(getProviderCurrentSupply(addr), providers[addr].data[height].priv );
         valid           = providers[addr].data[height].valid;
     }
-    function getProviderCurrentSupply(address addr) internal returns (uint256) {
+    function getProviderCurrentSupply(address addr) internal view returns (uint256) {
         /*
             Inner function for polling the current height and the current quantity of the connected capital of the schelling round.
             
@@ -469,7 +469,7 @@ contract provider is module, safeMath, announcementTypes {
         delete clients[msg.sender].providerConnected;
         EClientLost(msg.sender, provider, currHeight, bal);
     }
-    function checkReward(address addr) public view returns (uint256 reward) {
+    function checkReward(address addr) public returns (uint256 reward) {
         /*
             Polling the share from the token emission for clients and for providers.
             

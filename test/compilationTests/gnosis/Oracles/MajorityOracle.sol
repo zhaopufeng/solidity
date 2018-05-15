@@ -32,6 +32,7 @@ contract MajorityOracle is Oracle {
     /// @return Outcome
     function getStatusAndOutcome()
         public
+        view
         returns (bool outcomeSet, int outcome)
     {
         uint i;

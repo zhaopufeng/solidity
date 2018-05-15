@@ -417,7 +417,7 @@ contract schelling is module, announcementTypes, schellingVars {
             
         setVoter(msg.sender, voter);
     }
-    function checkReward() public view returns (uint256 reward) {
+    function checkReward() public returns (uint256 reward) {
         /*
             Withdraw of the amount of the prize (it’s only information).
             
@@ -496,7 +496,7 @@ contract schelling is module, announcementTypes, schellingVars {
         
         require( moduleHandler(moduleHandlerAddress).transfer(address(this), msg.sender, funds, true) );
     }
-    function getCurrentSchellingRoundID() public view returns (uint256) {
+    function getCurrentSchellingRoundID() public returns (uint256) {
         /*
             Number of actual Schelling round.
             
@@ -504,7 +504,7 @@ contract schelling is module, announcementTypes, schellingVars {
         */
         return getCurrentSchellingRound();
     }
-    function getSchellingRound(uint256 id) public view returns (uint256 expansion) {
+    function getSchellingRound(uint256 id) public returns (uint256 expansion) {
         /*
             Amount of token emission of the Schelling round.
             
