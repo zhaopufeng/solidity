@@ -1249,6 +1249,10 @@ bool TypeChecker::visit(VariableDeclarationStatement const& _statement)
 			}
 
 			var.accept(*this);
+
+			string typeName = var.annotation().type->toString(true);
+			m_errorReporter.syntaxError(var.location(),
+				"Use of the \"var\" keyword is disallowed. Use explicit type " + typeName + " instead.");
 		}
 		else
 		{
