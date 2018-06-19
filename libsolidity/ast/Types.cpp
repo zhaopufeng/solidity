@@ -1413,14 +1413,6 @@ bool ContractType::isImplicitlyConvertibleTo(Type const& _convertTo) const
 	return false;
 }
 
-bool ContractType::isExplicitlyConvertibleTo(Type const& _convertTo) const
-{
-	return
-		isImplicitlyConvertibleTo(_convertTo) ||
-		_convertTo.category() == Category::Integer ||
-		_convertTo.category() == Category::Contract;
-}
-
 bool ContractType::isPayable() const
 {
 	auto fallbackFunction = m_contract.fallbackFunction();

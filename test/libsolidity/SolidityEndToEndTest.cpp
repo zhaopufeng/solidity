@@ -12222,10 +12222,10 @@ BOOST_AUTO_TEST_CASE(staticcall_for_view_and_pure)
 				return (new C()).f();
 			}
 			function fview() public returns (uint) {
-				return (CView(new C())).f();
+				return (CView(address(new C()))).f();
 			}
 			function fpure() public returns (uint) {
-				return (CPure(new C())).f();
+				return (CPure(address(new C()))).f();
 			}
 		}
 	)";
