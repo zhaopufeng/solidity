@@ -299,4 +299,17 @@ extern char const* compileStandard(char const* _input, CStyleReadFileCallback _r
 	s_outputBuffer = compileStandardInternal(_input, _readCallback);
 	return s_outputBuffer.c_str();
 }
+extern char const* solidity_license()
+{
+	return license();
+}
+extern char const* solidity_version()
+{
+	return version();
+}
+extern char const* solidity_compile(char const* _input, CStyleReadFileCallback _readCallback)
+{
+	/// todo: make this the default or an alias
+	return compileStandard(_input, _readCallback);
+}
 }
