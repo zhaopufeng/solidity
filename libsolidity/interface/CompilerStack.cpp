@@ -191,6 +191,8 @@ bool CompilerStack::analyze()
 			if (!resolver.performImports(*source->ast, sourceUnitsByName))
 				return false;
 
+		// This is the main name and type resolution loop. Needs to be run for every contract, because
+		// the special variables "this" and "super" must be set appropriately.
 		for (Source const* source: m_sourceOrder)
 			for (ASTPointer<ASTNode> const& node: source->ast->nodes())
 				if (ContractDefinition* contract = dynamic_cast<ContractDefinition*>(node.get()))
@@ -204,11 +206,13 @@ bool CompilerStack::analyze()
 					// thus contracts can only conflict if declared in the same source file.  This
 					// already causes a double-declaration error elsewhere, so we do not report
 					// an error here and instead silently drop any additional contracts we find.
-
 					if (m_contracts.find(contract->fullyQualifiedName()) == m_contracts.end())
 						m_contracts[contract->fullyQualifiedName()].contract = contract;
 				}
 
+		// WHy cannot be this done in the above loop?
+		// Note: this does not resolve overloaded functions. In order to do that, types of arguments are needed,
+		// which is only done one step later.
 		TypeChecker typeChecker(m_evmVersion, m_errorReporter);
 		for (Source const* source: m_sourceOrder)
 			for (ASTPointer<ASTNode> const& node: source->ast->nodes())
@@ -218,6 +222,7 @@ bool CompilerStack::analyze()
 
 		if (noErrors)
 		{
+			// Checks that can only be done when all types of all AST nodes are known.
 			PostTypeChecker postTypeChecker(m_errorReporter);
 			for (Source const* source: m_sourceOrder)
 				if (!postTypeChecker.check(*source->ast))
@@ -226,6 +231,7 @@ bool CompilerStack::analyze()
 
 		if (noErrors)
 		{
+			// Control flow graph: currently checks that variable is not used before it is assigned to.
 			CFG cfg(m_errorReporter);
 			for (Source const* source: m_sourceOrder)
 				if (!cfg.constructFlow(*source->ast))
@@ -242,6 +248,7 @@ bool CompilerStack::analyze()
 
 		if (noErrors)
 		{
+			// Checks for common mistakes. Only generates warnings.
 			StaticAnalyzer staticAnalyzer(m_errorReporter);
 			for (Source const* source: m_sourceOrder)
 				if (!staticAnalyzer.analyze(*source->ast))
@@ -250,6 +257,7 @@ bool CompilerStack::analyze()
 
 		if (noErrors)
 		{
+			// Check for state mutability in every function.
 			vector<ASTPointer<ASTNode>> ast;
 			for (Source const* source: m_sourceOrder)
 				ast.push_back(source->ast);
@@ -300,6 +308,7 @@ bool CompilerStack::compile()
 		if (!parseAndAnalyze())
 			return false;
 
+	// Explain?
 	map<ContractDefinition const*, eth::Assembly const*> compiledContracts;
 	for (Source const* source: m_sourceOrder)
 		for (ASTPointer<ASTNode> const& node: source->ast->nodes())

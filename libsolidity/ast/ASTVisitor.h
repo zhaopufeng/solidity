@@ -145,6 +145,7 @@ protected:
 	virtual void endVisitNode(ASTNode&) { }
 };
 
+// Post visitor. endVisit ensure the child types are already visited
 class ASTConstVisitor
 {
 public:
