@@ -34,7 +34,7 @@ class Result
 {
 public:
 	Result(T _value): m_value(std::move(_value)) {}
-	Result(T _value, std::string const& _err): m_value(std::move(_value)), m_err(std::move(_err)) {}
+	Result(T _value, std::string _err): m_value(std::move(_value)), m_err(std::move(_err)) {}
 
 	operator bool() const { return m_value ? true : false; }
 
