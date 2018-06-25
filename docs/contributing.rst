@@ -93,6 +93,12 @@ Alternatively, there is a testing script at ``scripts/test.sh`` which executes a
 
 Travis CI even runs some additional tests (including ``solc-js`` and testing third party Solidity frameworks) that require compiling the Emscripten target.
 
+.. note ::
+
+While any version of ``cpp-ethereum`` should be usable, this cannot be guaranteed, and it is suggested to use the same version as used by the Solidity continuous integration tests are doing.
+To find the current commit hash of `cpp-ethereum`` being used have a look at the ``scripts/tests.sh``, which downloads pre-built ``cpp-ethereum`` binaries and should have a comment like
+``built from 5ac09111bd0b6518365fe956e1bdb97a2db82af1 at 2018-04-05``.
+
 Writing and running syntax tests
 --------------------------------
 
