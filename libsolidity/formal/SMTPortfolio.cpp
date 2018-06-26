@@ -111,20 +111,10 @@ pair<CheckResult, vector<string>> SMTPortfolio::check(vector<Expression> const& 
 			// lastResult can never be ERROR.
 			else if (lastResult != result)
 			{
-				solAssert(false, "At least two SMT solvers gave opposing results.");
+				lastResult = CheckResult::CONFLICTING;
+				break;
 			}
 		}
 	}
 	return make_pair(lastResult, finalValues);
 }
-
-
-
-
-
-
-
-
-
-
-
