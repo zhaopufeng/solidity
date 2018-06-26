@@ -67,7 +67,7 @@ contract AuctionSystem {
 	function onAuctionEnd(string _name) internal;
 
 	function bid(string _name, address _bidder, uint _value) internal {
-		var auction = m_auctions[_name];
+		Auction auction = m_auctions[_name];
 		if (auction.endDate > 0 && now > auction.endDate)
 		{
 			AuctionEnded(_name, auction.highestBidder);
@@ -117,9 +117,9 @@ contract GlobalRegistrar is Registrar, AuctionSystem {
 	}
 
 	function onAuctionEnd(string _name) internal {
-		var auction = m_auctions[_name];
-		var record = m_toRecord[_name];
-		var previousOwner = record.owner;
+		Auction auction = m_auctions[_name];
+		Record record = m_toRecord[_name];
+		address previousOwner = record.owner;
 		record.renewalDate = now + c_renewalInterval;
 		record.owner = auction.highestBidder;
 		Changed(_name);

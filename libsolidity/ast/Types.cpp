@@ -2626,6 +2626,52 @@ string FunctionType::canonicalName() const
 	return "function";
 }
 
+string functionTypeKindToString(FunctionType::Kind kind)
+{
+	switch (kind)
+	{
+	case FunctionType::Kind::Internal:  return "internal";
+	case FunctionType::Kind::External:  return "external";
+	case FunctionType::Kind::CallCode:  return "callcode";
+	case FunctionType::Kind::DelegateCall:  return "delegatecall";
+	case FunctionType::Kind::BareCall:  return "barecall";
+	case FunctionType::Kind::BareCallCode:  return "barecallcode";
+	case FunctionType::Kind::BareDelegateCall:  return "baredelegatecall";
+	case FunctionType::Kind::Creation:  return "creation";
+	case FunctionType::Kind::Send:  return "send";
+	case FunctionType::Kind::Transfer:  return "transfer";
+	case FunctionType::Kind::SHA3:  return "sha3";
+	case FunctionType::Kind::Selfdestruct:  return "selfdestruct";
+	case FunctionType::Kind::Revert:  return "revert";
+	case FunctionType::Kind::ECRecover:  return "ecrecover";
+	case FunctionType::Kind::SHA256:  return "sha256";
+	case FunctionType::Kind::RIPEMD160:  return "ripemd160";
+	case FunctionType::Kind::Log0:  return "log0";
+	case FunctionType::Kind::Log1:  return "log1";
+	case FunctionType::Kind::Log2:  return "log2";
+	case FunctionType::Kind::Log3:  return "log3";
+	case FunctionType::Kind::Log4:  return "log4";
+	case FunctionType::Kind::GasLeft:  return "gasleft";
+	case FunctionType::Kind::Event:  return "event";
+	case FunctionType::Kind::SetGas:  return "setgas";
+	case FunctionType::Kind::SetValue:  return "setvalue";
+	case FunctionType::Kind::BlockHash:  return "blockhash";
+	case FunctionType::Kind::AddMod:  return "addmod";
+	case FunctionType::Kind::MulMod:  return "mulmod";
+	case FunctionType::Kind::ArrayPush:  return "arraypush";
+	case FunctionType::Kind::ArrayPop:  return "arraypop";
+	case FunctionType::Kind::ByteArrayPush:  return "bytearraypush";
+	case FunctionType::Kind::ObjectCreation:  return "objectcreation";
+	case FunctionType::Kind::Assert:  return "assert";
+	case FunctionType::Kind::Require:  return "require";
+	case FunctionType::Kind::ABIEncode:  return "abiencode";
+	case FunctionType::Kind::ABIEncodePacked:  return "abiencodepacked";
+	case FunctionType::Kind::ABIEncodeWithSelector:  return "abiencodewithselector";
+	case FunctionType::Kind::ABIEncodeWithSignature:  return "abiencodewithsignature";
+	default: solAssert(false, "Unknown function location.");
+	}
+}
+
 string FunctionType::toString(bool _short) const
 {
 	string name = "function (";
@@ -2636,6 +2682,15 @@ string FunctionType::toString(bool _short) const
 		name += " " + stateMutabilityToString(m_stateMutability);
 	if (m_kind == Kind::External)
 		name += " external";
+#if 0 // !defined(NDEBUG)
+	// XXX this is purely for debugging purposes
+	else
+	{
+		name += " [[";
+		name += functionTypeKindToString(m_kind);
+		name += "]]";
+	}
+#endif
 	if (!m_returnParameterTypes.empty())
 	{
 		name += " returns (";
