@@ -489,8 +489,9 @@ bool ContractCompiler::visit(FunctionDefinition const& _function)
 			m_context << swapInstruction(stackLayout.size() - stackLayout.back() - 1);
 			swap(stackLayout[stackLayout.back()], stackLayout.back());
 		}
-	//@todo assert that everything is in place now
-
+	for (int i = 0; i < int(stackLayout.size()); ++i)
+		if (stackLayout[i] != i)
+			solAssert(false, "Invalid stack layout on cleanup.");
 
 	for (ASTPointer<VariableDeclaration const> const& variable: _function.parameters() + _function.returnParameters())
 		m_context.removeVariable(*variable);
@@ -830,7 +831,7 @@ bool ContractCompiler::visit(VariableDeclarationStatement const& _variableDeclar
 {
 	CompilerContext::LocationSetter locationSetter(m_context, _variableDeclarationStatement);
 
-	// Local variable slots are reserved when their declaration is seen,
+	// Local variable slots are reserved when their declaration is visited,
 	// and freed in the end of their scope.
 	for (auto _decl: _variableDeclarationStatement.declarations())
 		if (_decl)
