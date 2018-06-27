@@ -175,7 +175,6 @@ private:
 	ErrorReporter& m_errorReporter;
 
 	FunctionDefinition const* m_currentFunction = nullptr;
-	std::map<FunctionDefinition const*, std::shared_ptr<smt::Expression>> m_symbolicFunctions;
 };
 
 }

@@ -85,8 +85,6 @@ void SMTChecker::endVisit(FunctionDefinition const&)
 	// TOOD we could check for "reachability", i.e. satisfiability here.
 	// We only handle local variables, so we clear at the beginning of the function.
 	// If we add storage variables, those should be cleared differently.
-	if (!m_symbolicFunctions.count(m_currentFunction))
-		m_symbolicFunctions.insert({m_currentFunction, m_interface->assertions()});
 	removeLocalVariables();
 	m_currentFunction = nullptr;
 }
@@ -366,18 +364,6 @@ void SMTChecker::endVisit(FunctionCall const& _funCall)
 		solAssert(args[0]->annotation().type->category() == Type::Category::Bool, "");
 		checkBooleanNotConstant(*args[0], "Condition is always $VALUE.");
 		addPathImpliedExpression(expr(*args[0]));
-	}
-	else
-	{
-		Identifier const* _funId = dynamic_cast<Identifier const*>(&_funCall.expression());
-		FunctionDefinition const* _funDef = dynamic_cast<FunctionDefinition const*>(_funId->annotation().referencedDeclaration);
-		solAssert(_funDef, "");
-
-		if (m_symbolicFunctions.count(_funDef))
-		{
-			smt::Expression expr = copyWithIndex(*m_symbolicFunctions[_funDef], 666);
-			m_interface->addAssertion(expr);
-		}
 	}
 }
 
@@ -910,7 +896,6 @@ void SMTChecker::removeLocalVariables()
 			++it;
 	}
 }
-
 
 smt::Expression SMTChecker::copyWithIndex(smt::Expression const& _expr, unsigned _index)
 {
