@@ -25,10 +25,11 @@
 
 #include <boost/noncopyable.hpp>
 
+#include <cstdio>
 #include <map>
+#include <set>
 #include <string>
 #include <vector>
-#include <cstdio>
 
 namespace dev
 {
@@ -175,11 +176,11 @@ public:
 	std::vector<Expression> const arguments;
 	Sort sort;
 
-private:
 	/// Manual constructor, should only be used by SolverInterface and this class itself.
 	Expression(std::string _name, std::vector<Expression> _arguments, Sort _sort):
 		name(std::move(_name)), arguments(std::move(_arguments)), sort(_sort) {}
 
+private:
 	explicit Expression(std::string _name, Sort _sort):
 		Expression(std::move(_name), std::vector<Expression>{}, _sort) {}
 	Expression(std::string _name, Expression _arg, Sort _sort):
