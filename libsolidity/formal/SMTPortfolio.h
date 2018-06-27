@@ -24,6 +24,7 @@
 
 #include <boost/noncopyable.hpp>
 
+#include <set>
 #include <vector>
 
 namespace dev
@@ -50,8 +51,15 @@ public:
 	void addAssertion(Expression const& _expr) override;
 	std::pair<CheckResult, std::vector<std::string>> check(std::vector<Expression> const& _expressionsToEvaluate) override;
 
+	bool isVariable(smt::Expression const& _expr);
+
+	std::shared_ptr<smt::Expression> assertions();
+	std::set<std::string>& variables();
+
 private:
 	std::vector<std::shared_ptr<smt::SolverInterface>> m_solvers;
+	std::set<std::string> m_variables;
+	std::vector<std::shared_ptr<smt::Expression>> m_assertions;
 };
 
 }

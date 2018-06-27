@@ -34,33 +34,38 @@ using namespace dev::solidity::smt;
 SMTPortfolio::SMTPortfolio(ReadCallback::Callback const& _readCallback)
 {
 #ifdef HAVE_Z3
-	m_solvers.emplace_back(make_shared<smt::Z3Interface>());
+	m_solvers.emplace_back(make_shared<Z3Interface>());
 #endif
 #ifdef HAVE_CVC4
-	m_solvers.emplace_back(make_shared<smt::CVC4Interface>());
+	m_solvers.emplace_back(make_shared<CVC4Interface>());
 #endif
 #if !defined (HAVE_Z3) && !defined (HAVE_CVC4)
-	m_solvers.emplace_back(make_shared<smt::SMTLib2Interface>(_readCallback)),
+	m_solvers.emplace_back(make_shared<SMTLib2Interface>(_readCallback)),
 #endif
 	(void)_readCallback;
+	reset();
 }
 
 void SMTPortfolio::reset()
 {
 	for (auto s : m_solvers)
 		s->reset();
+	m_assertions.clear();
+	m_assertions.push_back(make_shared<smt::Expression>(true));
 }
 
 void SMTPortfolio::push()
 {
 	for (auto s : m_solvers)
 		s->push();
+	m_assertions.push_back(make_shared<smt::Expression>(true));
 }
 
 void SMTPortfolio::pop()
 {
 	for (auto s : m_solvers)
 		s->pop();
+	m_assertions.pop_back();
 }
 
 void SMTPortfolio::declareFunction(string _name, Sort _domain, Sort _codomain)
@@ -71,12 +76,14 @@ void SMTPortfolio::declareFunction(string _name, Sort _domain, Sort _codomain)
 
 void SMTPortfolio::declareInteger(string _name)
 {
+	m_variables.insert(_name);
 	for (auto s : m_solvers)
 		s->declareInteger(_name);
 }
 
 void SMTPortfolio::declareBool(string _name)
 {
+	m_variables.insert(_name);
 	for (auto s : m_solvers)
 		s->declareBool(_name);
 }
@@ -85,6 +92,7 @@ void SMTPortfolio::addAssertion(Expression const& _expr)
 {
 	for (auto s : m_solvers)
 		s->addAssertion(_expr);
+	m_assertions.back().reset(new Expression(*m_assertions.back() && _expr));
 }
 
 pair<CheckResult, vector<string>> SMTPortfolio::check(vector<Expression> const& _expressionsToEvaluate)
@@ -117,4 +125,19 @@ pair<CheckResult, vector<string>> SMTPortfolio::check(vector<Expression> const& 
 		}
 	}
 	return make_pair(lastResult, finalValues);
+}
+
+bool SMTPortfolio::isVariable(Expression const& _expr)
+{
+	return m_variables.count(_expr.name);
+}
+
+shared_ptr<Expression> SMTPortfolio::assertions()
+{
+	return m_assertions.back();
+}
+
+set<string>& SMTPortfolio::variables()
+{
+	return m_variables;
 }

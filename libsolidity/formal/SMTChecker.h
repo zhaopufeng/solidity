@@ -18,7 +18,7 @@
 #pragma once
 
 
-#include <libsolidity/formal/SolverInterface.h>
+#include <libsolidity/formal/SMTPortfolio.h>
 
 #include <libsolidity/formal/SSAVariable.h>
 
@@ -164,7 +164,9 @@ private:
 	/// Removes the local variables of a function.
 	void removeLocalVariables();
 
-	std::shared_ptr<smt::SolverInterface> m_interface;
+	smt::Expression copyWithIndex(smt::Expression const& _expr, unsigned _index);
+
+	std::shared_ptr<smt::SMTPortfolio> m_interface;
 	std::shared_ptr<VariableUsage> m_variableUsage;
 	bool m_loopExecutionHappened = false;
 	std::map<Expression const*, smt::Expression> m_expressions;
@@ -173,6 +175,7 @@ private:
 	ErrorReporter& m_errorReporter;
 
 	FunctionDefinition const* m_currentFunction = nullptr;
+	std::map<FunctionDefinition const*, std::shared_ptr<smt::Expression>> m_symbolicFunctions;
 };
 
 }
