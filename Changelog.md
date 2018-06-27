@@ -12,7 +12,7 @@ Breaking Changes:
  * General: Disallow ``sha3`` and ``suicide`` aliases.
  * General: Disallow the ``years`` unit denomination (was already deprecated in 0.4.24)
  * General: Introduce ``emit`` as a keyword instead of parsing it as identifier.
- * General: New keywords: ``calldata``
+ * General: New keywords: ``calldata`` and ``constructor``
  * General: New reserved keywords: ``alias``, ``apply``, ``auto``, ``copyof``, ``define``, ``immutable``,
    ``implements``, ``macro``, ``mutable``, ``override``, ``partial``, ``promise``, ``reference``, ``sealed``,
    ``sizeof``, ``supports``, ``typedef`` and ``unchecked``.
